@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lança PIBID - Registro de Atividades</title>
+  <!-- Ícones de Educação (Font Awesome) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Fonte Limpa e Moderna -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #3b82f6;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --tag-bg: #eff6ff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 40px; }
+
+    /* Cabeçalho */
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; color: var(--primary); font-weight: 700; font-size: 1.25rem; }
+    .brand i { font-size: 1.5rem; color: var(--primary-light); }
+    .user-info { display: flex; align-items: center; gap: 12px; }
+    .logout-btn {
+      background: transparent; border: 1px solid var(--border);
+      padding: 6px 12px; border-radius: 6px; cursor: pointer; color: var(--text-muted);
+    }
+    .logout-btn:hover { background: #f1f5f9; color: var(--text); }
+
+    .container { max-width: 900px; margin: 32px auto; padding: 0 16px; }
+
+    /* Cards e Formulários */
+    .card {
+      background: var(--card-bg); border-radius: 12px;
+      border: 1px solid var(--border); padding: 24px; margin-bottom: 24px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+    .card-title {
+      font-size: 1.1rem; font-weight: 600; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px; color: var(--primary);
+    }
+
+    /* Modal de Login */
+    .login-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.6); display: flex; align-items: center; justify-content: center; z-index: 100;
+    }
+    .login-box { background: white; padding: 32px; border-radius: 16px; width: 100%; max-width: 440px; text-align: center; }
+    .login-tabs { display: flex; gap: 4px; margin-bottom: 20px; background: #f1f5f9; padding: 4px; border-radius: 8px; }
+    .tab-btn { flex: 1; padding: 8px 4px; border: none; border-radius: 6px; cursor: pointer; background: transparent; font-weight: 500; font-size: 0.85rem; }
+    .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+    /* Inputs */
+    .form-group { margin-bottom: 16px; text-align: left; }
+    label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 6px; color: var(--text-muted); }
+    input, textarea {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+      border-radius: 8px; outline: none; font-size: 0.95rem;
+    }
+    input:focus, textarea:focus { border-color: var(--primary-light); }
+
+    .btn {
+      background: var(--primary); color: white; border: none; padding: 10px 18px;
+      border-radius: 8px; font-weight: 500; cursor: pointer; display: inline-flex;
+      align-items: center; gap: 8px; transition: background 0.2s;
+    }
+    .btn:hover { background: #1d4ed8; }
+    .btn-secondary { background: #f1f5f9; color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: #e2e8f0; }
+
+    /* Tags */
+    .meta-tags { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+    .tag {
+      background: var(--tag-bg); color: var(--primary);
+      padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 500;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+
+    /* Lista de Atividades */
+    .activity-item { border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 20px; }
+    .activity-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .activity-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .activity-title { font-weight: 600; font-size: 1.05rem; }
+    .activity-date { font-size: 0.85rem; color: var(--text-muted); }
+    .activity-desc { font-size: 0.95rem; line-height: 1.5; color: #334155; margin-bottom: 12px; }
+    .activity-photo { max-width: 100%; max-height: 250px; border-radius: 8px; margin-top: 8px; object-fit: cover; }
+
+    /* Comentários */
+    .comment-box {
+      background: #f8fafc; border-left: 3px solid var(--primary-light);
+      padding: 10px 14px; border-radius: 0 6px 6px 0; margin-top: 10px; font-size: 0.9rem;
+    }
+    .comment-author { font-weight: 600; color: var(--primary); margin-bottom: 2px; display: block; font-size: 0.825rem; }
+
+    /* Impressão / PDF */
+    @media print {
+      header, .no-print, .login-overlay, .btn { display: none !important; }
+      body { background: white; color: black; }
+      .container { max-width: 100%; margin: 0; padding: 0; }
+      .card { border: none; box-shadow: none; padding: 0; }
+      .activity-item { page-break-inside: avoid; border-bottom: 1px solid #ccc; padding: 15px 0; }
+      .print-header { display: block !important; text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+    }
+    .print-header { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- Modal de Login -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-box">
+      <div style="font-size: 2rem; color: var(--primary); margin-bottom: 12px;">
+        <i class="fa-solid fa-graduation-cap"></i>
+      </div>
+      <h2 style="font-size: 1.25rem; margin-bottom: 6px;">Portal Lança PIBID</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">Selecione seu perfil para acessar</p>
+
+      <div class="login-tabs">
+        <button class="tab-btn active" id="tabBolsista" onclick="setLoginRole('bolsista')"><i class="fa-solid fa-user-graduate"></i> Bolsista</button>
+        <button class="tab-btn" id="tabSupervisora" onclick="setLoginRole('supervisora')"><i class="fa-solid fa-user-check"></i> Supervisora</button>
+        <button class="tab-btn" id="tabCoordenador" onclick="setLoginRole('coordenador')"><i class="fa-solid fa-user-tie"></i> Coordenador</button>
+      </div>
+
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>CPF</label>
+          <input type="text" id="loginCpf" placeholder="000.000.000-00" required>
+        </div>
+        <div class="form-group">
+          <label>Senha</label>
+          <input type="password" id="loginSenha" placeholder="Sua senha" required>
+        </div>
+        <button type="submit" class="btn" style="width: 100%; justify-content: center;">Entrar no Sistema</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Cabeçalho -->
+  <header>
+    <div class="brand">
+      <i class="fa-solid fa-book-open"></i>
+      <span>Lança PIBID</span>
+    </div>
+    <div class="user-info" id="userInfo" style="display: none;">
+      <span id="userRoleBadge" style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted);"></span>
+      <button class="logout-btn" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
+    </div>
+  </header>
+
+  <!-- Cabeçalho para PDF -->
+  <div class="print-header">
+    <h2><i class="fa-solid fa-graduation-cap"></i> Relatório de Atividades - PIBID</h2>
+    <p>Prestação de Contas das Escolas Parceiras</p>
+  </div>
+
+  <div class="container" id="mainContent" style="display: none;">
+
+    <!-- PAINEL DO BOLSISTA: Form de Lançamento -->
+    <div class="card no-print" id="formSection">
+      <div class="card-title">
+        <i class="fa-solid fa-pen-to-square"></i> Lançar Nova Atividade
+      </div>
+      <form onsubmit="salvarAtividade(event)">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label>Escola Parceira</label>
+            <input type="text" id="actSchool" placeholder="Ex: E.E. Professor José" required>
+          </div>
+          <div class="form-group">
+            <label>Supervisora Responsável</label>
+            <input type="text" id="actSupervisor" placeholder="Ex: Profa. Maria Silva" required>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 16px;">
+          <div class="form-group">
+            <label>Data da Atividade</label>
+            <input type="date" id="actDate" required>
+          </div>
+          <div class="form-group">
+            <label>Título da Atividade</label>
+            <input type="text" id="actTitle" placeholder="Ex: Observação e Regência na Turma 8º B" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Descrição Detalhada</label>
+          <textarea id="actDesc" rows="3" placeholder="Descreva os objetivos, metodologia e resultados..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Foto / Registro Fotográfico (Opcional)</label>
+          <input type="file" id="actPhoto" accept="image/*">
+        </div>
+
+        <button type="submit" class="btn"><i class="fa-solid fa-plus"></i> Registrar Atividade</button>
+      </form>
+    </div>
+
+    <!-- LISTA DE ATIVIDADES -->
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div class="card-title" style="margin-bottom: 0;">
+          <i class="fa-solid fa-list-check"></i> Histórico de Atividades
+        </div>
+        <button class="btn btn-secondary no-print" onclick="window.print()">
+          <i class="fa-solid fa-print"></i> Imprimir / PDF
+        </button>
+      </div>
+
+      <div id="activitiesList">
+        <p style="color: var(--text-muted); text-align: center; padding: 20px 0;">Nenhuma atividade registrada ainda.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let currentRole = 'bolsista';
+    let currentUser = null;
+
+    function setLoginRole(role) {
+      currentRole = role;
+      document.getElementById('tabBolsista').classList.toggle('active', role === 'bolsista');
+      document.getElementById('tabSupervisora').classList.toggle('active', role === 'supervisora');
+      document.getElementById('tabCoordenador').classList.toggle('active', role === 'coordenador');
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const cpf = document.getElementById('loginCpf').value;
+      currentUser = { cpf, role: currentRole };
+
+      document.getElementById('loginOverlay').style.display = 'none';
+      document.getElementById('mainContent').style.display = 'block';
+      document.getElementById('userInfo').style.display = 'flex';
+      
+      const roleLabels = { bolsista: 'Bolsista', supervisora: 'Supervisora', coordenador: 'Coordenador' };
+      document.getElementById('userRoleBadge').textContent = `${roleLabels[currentRole]} (${cpf})`;
+
+      // Somente Bolsistas podem criar novos lançamentos
+      document.getElementById('formSection').style.display = currentRole === 'bolsista' ? 'block' : 'none';
+
+      carregarAtividades();
+    }
+
+    function logout() {
+      currentUser = null;
+      document.getElementById('loginOverlay').style.display = 'flex';
+      document.getElementById('mainContent').style.display = 'none';
+      document.getElementById('userInfo').style.display = 'none';
+    }
+
+    function getAtividades() {
+      return JSON.parse(localStorage.getItem('pibid_atividades') || '[]');
+    }
+
+    function salvarAtividade(e) {
+      e.preventDefault();
+      const school = document.getElementById('actSchool').value;
+      const supervisor = document.getElementById('actSupervisor').value;
+      const date = document.getElementById('actDate').value;
+      const title = document.getElementById('actTitle').value;
+      const desc = document.getElementById('actDesc').value;
+      const photoInput = document.getElementById('actPhoto');
+
+      const novaAtividade = {
+        id: Date.now(),
+        cpf: currentUser.cpf,
+        school,
+        supervisor,
+        date,
+        title,
+        desc,
+        photo: null,
+        comments: []
+      };
+
+      if (photoInput.files && photoInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          novaAtividade.photo = e.target.result;
+          finalizarSalvar(novaAtividade);
+        };
+        reader.readAsDataURL(photoInput.files[0]);
+      } else {
+        finalizarSalvar(novaAtividade);
+      }
+    }
+
+    function finalizarSalvar(atividade) {
+      const atividades = getAtividades();
+      atividades.unshift(atividade);
+      localStorage.setItem('pibid_atividades', JSON.stringify(atividades));
+      
+      // Limpa formulário
+      document.getElementById('actSchool').value = '';
+      document.getElementById('actSupervisor').value = '';
+      document.getElementById('actDate').value = '';
+      document.getElementById('actTitle').value = '';
+      document.getElementById('actDesc').value = '';
+      document.getElementById('actPhoto').value = '';
+
+      carregarAtividades();
+    }
+
+    function adicionarComentario(id) {
+      const commentInput = document.getElementById(`comment-input-${id}`);
+      const text = commentInput.value.trim();
+      if (!text) return;
+
+      const atividades = getAtividades();
+      const index = atividades.findIndex(a => a.id === id);
+      if (index !== -1) {
+        const roleName = currentUser.role === 'supervisora' ? 'Supervisora' : 'Coordenador';
+        atividades[index].comments.push({
+          autor: `${roleName} (${currentUser.cpf})`,
+          texto: text
+        });
+        localStorage.setItem('pibid_atividades', JSON.stringify(atividades));
+        carregarAtividades();
+      }
+    }
+
+    function carregarAtividades() {
+      const listEl = document.getElementById('activitiesList');
+      const atividades = getAtividades();
+
+      if (atividades.length === 0) {
+        listEl.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px 0;">Nenhuma atividade registrada ainda.</p>';
+        return;
+      }
+
+      listEl.innerHTML = atividades.map(act => `
+        <div class="activity-item">
+          
+          <div class="meta-tags">
+            <span class="tag"><i class="fa-solid fa-school"></i> ${act.school || 'Escola não informada'}</span>
+            <span class="tag"><i class="fa-solid fa-user-check"></i> Sup: ${act.supervisor || 'Não informada'}</span>
+            <span class="tag" style="background: #f1f5f9; color: var(--text-muted);"><i class="fa-solid fa-user"></i> Bolsista: ${act.cpf}</span>
+          </div>
+
+          <div class="activity-header">
+            <span class="activity-title">${act.title}</span>
+            <span class="activity-date"><i class="fa-regular fa-calendar"></i> ${new Date(act.date).toLocaleDateString('pt-BR')}</span>
+          </div>
+          
+          <p class="activity-desc">${act.desc}</p>
+          ${act.photo ? `<img src="\${act.photo}" class="activity-photo" alt="Foto da Atividade">` : ''}
+
+          <!-- Exibição de Comentários / Avaliações -->
+          ${act.comments && act.comments.length > 0 ? act.comments.map(c => `
+            <div class="comment-box">
+              <span class="comment-author"><i class="fa-solid fa-comment-dots"></i> \\({c.autor}:</span>
+              \\){c.texto}
+            </div>
+          `).join('') : ''}
+
+          <!-- Espaço de Comentário para Supervisora ou Coordenador -->
+          ${(currentUser.role === 'coordenador' || currentUser.role === 'supervisora') ? `
+            <div class="no-print" style="margin-top: 12px; display: flex; gap: 8px;">
+              <input type="text" id="comment-input-\${act.id}" placeholder="Adicionar parecer sobre esta atividade..." style="font-size: 0.85rem;">
+              <button class="btn" style="padding: 6px 12px; font-size: 0.85rem;" onclick="adicionarComentario(\${act.id})">Comentar</button>
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>
