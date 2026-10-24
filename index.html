@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lança PIBID - Registro de Atividades</title>
-  <!-- Ícones de Educação (Font Awesome) -->
+  <!-- Ícones de Educação -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Fonte Limpa e Moderna -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -255,7 +255,6 @@
       const roleLabels = { bolsista: 'Bolsista', supervisora: 'Supervisora', coordenador: 'Coordenador' };
       document.getElementById('userRoleBadge').textContent = `${roleLabels[currentRole]} (${cpf})`;
 
-      // Somente Bolsistas podem criar novos lançamentos
       document.getElementById('formSection').style.display = currentRole === 'bolsista' ? 'block' : 'none';
 
       carregarAtividades();
@@ -310,7 +309,6 @@
       atividades.unshift(atividade);
       localStorage.setItem('pibid_atividades', JSON.stringify(atividades));
       
-      // Limpa formulário
       document.getElementById('actSchool').value = '';
       document.getElementById('actSupervisor').value = '';
       document.getElementById('actDate').value = '';
@@ -363,21 +361,19 @@
           </div>
           
           <p class="activity-desc">${act.desc}</p>
-          ${act.photo ? `<img src="\${act.photo}" class="activity-photo" alt="Foto da Atividade">` : ''}
+          ${act.photo ? `<img src="${act.photo}" class="activity-photo" alt="Foto da Atividade">` : ''}
 
-          <!-- Exibição de Comentários / Avaliações -->
           ${act.comments && act.comments.length > 0 ? act.comments.map(c => `
             <div class="comment-box">
-              <span class="comment-author"><i class="fa-solid fa-comment-dots"></i> \\({c.autor}:</span>
-              \\){c.texto}
+              <span class="comment-author"><i class="fa-solid fa-comment-dots"></i> ${c.autor}:</span>
+              ${c.texto}
             </div>
           `).join('') : ''}
 
-          <!-- Espaço de Comentário para Supervisora ou Coordenador -->
           ${(currentUser.role === 'coordenador' || currentUser.role === 'supervisora') ? `
             <div class="no-print" style="margin-top: 12px; display: flex; gap: 8px;">
-              <input type="text" id="comment-input-\${act.id}" placeholder="Adicionar parecer sobre esta atividade..." style="font-size: 0.85rem;">
-              <button class="btn" style="padding: 6px 12px; font-size: 0.85rem;" onclick="adicionarComentario(\${act.id})">Comentar</button>
+              <input type="text" id="comment-input-${act.id}" placeholder="Adicionar parecer sobre esta atividade..." style="font-size: 0.85rem;">
+              <button class="btn" style="padding: 6px 12px; font-size: 0.85rem;" onclick="adicionarComentario(${act.id})">Comentar</button>
             </div>
           ` : ''}
         </div>
